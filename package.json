@@ -1,0 +1,15 @@
+{
+  "name": "nono_rent_design_system",
+  "version": "0.1.0",
+  "description": "Design system for nono_rent",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "typescript": "^5.0.0"
+  }
+}
