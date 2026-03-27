@@ -1,12 +1,25 @@
+var _a;
 export class NonoBase extends HTMLElement {
+    static css(strings, ...values) {
+        const style = new CSSStyleSheet();
+        style.replaceSync(String.raw(strings, ...values));
+        return style;
+    }
+    static html(strings, ...values) {
+        const template = document.createElement('template');
+        template.innerHTML = String.raw(strings, ...values);
+        return template.content;
+    }
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
-        this.addBaseStyles();
+        this.shadowRoot.adoptedStyleSheets = [_a.baseStyles];
     }
-    addBaseStyles() {
-        const style = document.createElement('style');
-        style.textContent = `
+}
+_a = NonoBase;
+(() => {
+    _a.baseStyles = new CSSStyleSheet();
+    _a.baseStyles.replaceSync(`
       :host {
         --primary-color: #007bff;
         --secondary-color: #6c757d;
@@ -41,8 +54,6 @@ export class NonoBase extends HTMLElement {
         white-space: nowrap;
         border: 0;
       }
-    `;
-        this.shadowRoot.appendChild(style);
-    }
-}
+    `);
+})();
 //# sourceMappingURL=NonoBase.js.map

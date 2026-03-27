@@ -1,13 +1,9 @@
 export class NonoBase extends HTMLElement {
-  constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-    this.addBaseStyles();
-  }
+  static baseStyles: CSSStyleSheet;
 
-  private addBaseStyles(): void {
-    const style = document.createElement('style');
-    style.textContent = `
+  static {
+    this.baseStyles = new CSSStyleSheet();
+    this.baseStyles.replaceSync(`
       :host {
         --primary-color: #007bff;
         --secondary-color: #6c757d;
@@ -42,7 +38,30 @@ export class NonoBase extends HTMLElement {
         white-space: nowrap;
         border: 0;
       }
-    `;
-    this.shadowRoot!.appendChild(style);
+    `);
+  }
+
+  static css(
+    strings: TemplateStringsArray,
+    ...values: string[]
+  ): CSSStyleSheet {
+    const style = new CSSStyleSheet();
+    style.replaceSync(String.raw(strings, ...values));
+    return style;
+  }
+
+  static html(
+    strings: TemplateStringsArray,
+    ...values: string[]
+  ): DocumentFragment {
+    const template = document.createElement("template");
+    template.innerHTML = String.raw(strings, ...values);
+    return template.content;
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this.shadowRoot!.adoptedStyleSheets = [NonoBase.baseStyles];
   }
 }

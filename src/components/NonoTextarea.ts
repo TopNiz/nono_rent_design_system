@@ -1,8 +1,8 @@
 import { NonoBase } from "./NonoBase.js";
 
-export class NonoInput extends NonoBase {
+export class NonoTextarea extends NonoBase {
   static styles = NonoBase.css`
-    .nono-input-container {
+    .nono-textarea-container {
       display: flex;
       flex-direction: column;
       gap: var(--spacing-xs);
@@ -15,7 +15,7 @@ export class NonoInput extends NonoBase {
       color: var(--dark-color);
     }
 
-    input {
+    textarea {
       font-family: var(--font-family);
       font-size: var(--font-size-base);
       padding: var(--spacing-sm);
@@ -23,13 +23,14 @@ export class NonoInput extends NonoBase {
       border-radius: var(--border-radius);
       outline: none;
       transition: border-color 0.2s;
+      resize: vertical;
     }
 
-    input:focus {
+    textarea:focus {
       border-color: var(--primary-color);
     }
 
-    input:invalid {
+    textarea:invalid {
       border-color: var(--danger-color);
     }
 
@@ -41,30 +42,38 @@ export class NonoInput extends NonoBase {
     }
   `;
 
-  private input: HTMLInputElement;
+  private textarea: HTMLTextAreaElement;
   private label: HTMLLabelElement;
   private error: HTMLSpanElement;
   private container: HTMLDivElement;
 
   constructor() {
     super();
-    this.shadowRoot!.adoptedStyleSheets.push(NonoInput.styles);
+    this.shadowRoot!.adoptedStyleSheets.push(NonoTextarea.styles);
     this.container = document.createElement("div");
-    this.container.classList.add("nono-input-container");
+    this.container.classList.add("nono-textarea-container");
     this.label = document.createElement("label");
-    this.input = document.createElement("input");
+    this.textarea = document.createElement("textarea");
     this.error = document.createElement("span");
     this.error.classList.add("error");
     this.container.appendChild(this.label);
-    this.container.appendChild(this.input);
+    this.container.appendChild(this.textarea);
     this.container.appendChild(this.error);
     this.shadowRoot!.appendChild(this.container);
-    this.updateInput();
+    this.updateTextarea();
     this.addEventListeners();
   }
 
   static get observedAttributes(): string[] {
-    return ["type", "label", "placeholder", "required", "value", "error"];
+    return [
+      "label",
+      "placeholder",
+      "required",
+      "value",
+      "rows",
+      "cols",
+      "error",
+    ];
   }
 
   attributeChangedCallback(
@@ -73,48 +82,50 @@ export class NonoInput extends NonoBase {
     newValue: string,
   ): void {
     if (oldValue !== newValue) {
-      this.updateInput();
+      this.updateTextarea();
     }
   }
 
-  private updateInput(): void {
-    const type = this.getAttribute("type") || "text";
+  private updateTextarea(): void {
     const label = this.getAttribute("label") || "";
     const placeholder = this.getAttribute("placeholder") || "";
     const required = this.hasAttribute("required");
     const value = this.getAttribute("value") || "";
+    const rows = parseInt(this.getAttribute("rows") || "4");
+    const cols = parseInt(this.getAttribute("cols") || "50");
     const error = this.getAttribute("error") || "";
 
-    this.input.type = type;
-    this.input.placeholder = placeholder;
-    this.input.required = required;
-    this.input.value = value;
     this.label.textContent = label;
+    this.textarea.placeholder = placeholder;
+    this.textarea.required = required;
+    this.textarea.value = value;
+    this.textarea.rows = rows;
+    this.textarea.cols = cols;
     this.error.textContent = error;
     this.error.style.display = error ? "block" : "none";
   }
 
   private addEventListeners(): void {
-    this.input.addEventListener("input", () => {
+    this.textarea.addEventListener("input", () => {
       this.dispatchEvent(
-        new CustomEvent("input", { detail: { value: this.input.value } }),
+        new CustomEvent("input", { detail: { value: this.textarea.value } }),
       );
     });
-    this.input.addEventListener("change", () => {
+    this.textarea.addEventListener("change", () => {
       this.dispatchEvent(
-        new CustomEvent("change", { detail: { value: this.input.value } }),
+        new CustomEvent("change", { detail: { value: this.textarea.value } }),
       );
     });
   }
 
   get value(): string {
-    return this.input.value;
+    return this.textarea.value;
   }
 
   set value(val: string) {
-    this.input.value = val;
+    this.textarea.value = val;
     this.setAttribute("value", val);
   }
 }
 
-customElements.define("nono-input", NonoInput);
+customElements.define("nono-textarea", NonoTextarea);
