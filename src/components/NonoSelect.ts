@@ -1,8 +1,8 @@
 import { NonoBase } from "./NonoBase.js";
 
-export class NonoInput extends NonoBase {
+export class NonoSelect extends NonoBase {
   static styles = NonoBase.css`
-    .nono-input-container {
+    .nono-select-container {
       display: flex;
       flex-direction: column;
       gap: var(--spacing-xs);
@@ -15,7 +15,7 @@ export class NonoInput extends NonoBase {
       color: var(--dark-color);
     }
 
-    input {
+    select {
       font-family: var(--font-family);
       font-size: var(--font-size-base);
       padding: var(--spacing-sm);
@@ -25,12 +25,8 @@ export class NonoInput extends NonoBase {
       transition: border-color 0.2s;
     }
 
-    input:focus {
+    select:focus {
       border-color: var(--primary-color);
-    }
-
-    input:invalid {
-      border-color: var(--danger-color);
     }
 
     .error {
@@ -41,30 +37,30 @@ export class NonoInput extends NonoBase {
     }
   `;
 
-  private input: HTMLInputElement;
+  private select: HTMLSelectElement;
   private label: HTMLLabelElement;
   private error: HTMLSpanElement;
   private container: HTMLDivElement;
 
   constructor() {
     super();
-    this.shadowRoot!.adoptedStyleSheets.push(NonoInput.styles);
+    this.shadowRoot!.adoptedStyleSheets.push(NonoSelect.styles);
     this.container = document.createElement("div");
-    this.container.classList.add("nono-input-container");
+    this.container.classList.add("nono-select-container");
     this.label = document.createElement("label");
-    this.input = document.createElement("input");
+    this.select = document.createElement("select");
     this.error = document.createElement("span");
     this.error.classList.add("error");
     this.container.appendChild(this.label);
-    this.container.appendChild(this.input);
+    this.container.appendChild(this.select);
     this.container.appendChild(this.error);
     this.shadowRoot!.appendChild(this.container);
-    this.updateInput();
+    this.updateSelect();
     this.addEventListeners();
   }
 
   static get observedAttributes(): string[] {
-    return ["type", "label", "placeholder", "required", "value", "error"];
+    return ["label", "options", "value", "required", "error"];
   }
 
   attributeChangedCallback(
@@ -73,48 +69,50 @@ export class NonoInput extends NonoBase {
     newValue: string,
   ): void {
     if (oldValue !== newValue) {
-      this.updateInput();
+      this.updateSelect();
     }
   }
 
-  private updateInput(): void {
-    const type = this.getAttribute("type") || "text";
+  private updateSelect(): void {
     const label = this.getAttribute("label") || "";
-    const placeholder = this.getAttribute("placeholder") || "";
-    const required = this.hasAttribute("required");
+    const options = JSON.parse(this.getAttribute("options") || "[]") as {
+      value: string;
+      label: string;
+    }[];
     const value = this.getAttribute("value") || "";
+    const required = this.hasAttribute("required");
     const error = this.getAttribute("error") || "";
 
-    this.input.type = type;
-    this.input.placeholder = placeholder;
-    this.input.required = required;
-    this.input.value = value;
     this.label.textContent = label;
+    this.select.innerHTML = "";
+    options.forEach((option) => {
+      const opt = document.createElement("option");
+      opt.value = option.value;
+      opt.textContent = option.label;
+      this.select.appendChild(opt);
+    });
+    this.select.value = value;
+    this.select.required = required;
     this.error.textContent = error;
     this.error.style.display = error ? "block" : "none";
   }
 
   private addEventListeners(): void {
-    this.input.addEventListener("input", () => {
+    this.select.addEventListener("change", () => {
       this.dispatchEvent(
-        new CustomEvent("input", { detail: { value: this.input.value } }),
-      );
-    });
-    this.input.addEventListener("change", () => {
-      this.dispatchEvent(
-        new CustomEvent("change", { detail: { value: this.input.value } }),
+        new CustomEvent("change", { detail: { value: this.select.value } }),
       );
     });
   }
 
   get value(): string {
-    return this.input.value;
+    return this.select.value;
   }
 
   set value(val: string) {
-    this.input.value = val;
+    this.select.value = val;
     this.setAttribute("value", val);
   }
 }
 
-customElements.define("nono-input", NonoInput);
+customElements.define("nono-select", NonoSelect);
