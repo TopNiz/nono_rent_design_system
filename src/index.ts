@@ -7,3 +7,4 @@ export { NonoSelect } from "./components/NonoSelect.js";
 export { NonoTextarea } from "./components/NonoTextarea.js";
 export { NonoCheckbox } from "./components/NonoCheckbox.js";
 export { NonoNavigationMenu } from "./components/NonoNavigationMenu.js";
+export { NonoEmptyState } from "./components/NonoEmptyState.js";
