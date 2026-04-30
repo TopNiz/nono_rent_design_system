@@ -59,8 +59,8 @@ export class NonoEmptyState extends NonoBase {
   `;
 
   private iconElement: HTMLSpanElement;
-  private titleElement: HTMLHeadingElement;
-  private descriptionElement: HTMLParagraphElement;
+  private titleElement: HTMLElement;
+  private descriptionElement: HTMLElement;
 
   constructor() {
     super();
@@ -70,10 +70,10 @@ export class NonoEmptyState extends NonoBase {
     this.shadowRoot!.appendChild(fragment);
 
     this.iconElement = this.shadowRoot!.querySelector(".icon") as HTMLSpanElement;
-    this.titleElement = this.shadowRoot!.querySelector(".title") as HTMLHeadingElement;
+    this.titleElement = this.shadowRoot!.querySelector(".title") as HTMLElement;
     this.descriptionElement = this.shadowRoot!.querySelector(
       ".description",
-    ) as HTMLParagraphElement;
+    ) as HTMLElement;
 
     this.updateView();
   }
